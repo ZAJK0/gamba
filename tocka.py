@@ -11,19 +11,19 @@ fruit = ["img/lemon.png","img/melon.png","img/seven.png"]
 winImg = "img/win.png"
 fruitWidth = 300
 fruitLenght = 300
-posx=200
+posx=400
 posy1 = 0
 posy2 = 0 
 posy3 = 0
 posy4 = 0
 posy5 = 0
-posy = [posy1,posy2,posy3,posy4,posy5]
+posy = [posy1,posy2,posy3,posy4]
 speed1 = 200
 speed2 = 250
 speed3 = 300
 speed4 = 350
 speed5 = 400
-speeds = [speed1,speed2,speed3,speed4,speed5]
+speeds = [speed1,speed2,speed3,speed4]
 
 res1 = random.randint(0,2)
 res2 = random.randint(0,2)
@@ -52,7 +52,7 @@ while running:
         for x in range(0,4):
             if(speeds[x]>0):
                 posy[x] = posy[x]+160
-                if(posy[x] >300):
+                if(posy[x] >180):
                     posy[x]=posy[x]-1600
                 speeds[x]= speeds[x]-5
                     
@@ -67,10 +67,8 @@ while running:
                 else:
                     img = seven
                 screen.blit(img, (posx+400*x,posy[x]+i*400+400*res[x]))
-                print("gamba")
         
     if (speeds[3] < 1):
-        print("speed")
         print(f"{res1}, {res2}, {res3}, {res4}")        
         if (res1 == res2 == res3 == res4):
             print("You win")
@@ -84,6 +82,6 @@ while running:
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(120)  # limits FPS to 60
+    clock.tick(60)  # limits FPS to 60
 
 pygame.quit()
