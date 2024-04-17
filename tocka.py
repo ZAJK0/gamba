@@ -17,7 +17,7 @@ point = result[3]
 
 
 pygame.init()
-screen = pygame.display.set_mode((2560, 1540))
+screen = pygame.display.set_mode((800, 480))
 clock = pygame.time.Clock()
 running = True
 
@@ -25,16 +25,30 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 GREEN_HOVER = (0, 200, 0)
 
-fruit = ["img/lemon.png","img/melon.png","img/seven.png"]
-winImg = "img/win.png"
-fruitWidth = 300
-fruitLenght = 300
-posx=400
+fruit = []
 
-lemon = pygame.transform.scale(pygame.image.load(fruit[0]),(fruitWidth,fruitLenght))
-melon = pygame.transform.scale(pygame.image.load(fruit[1]),(fruitWidth,fruitLenght))
-seven = pygame.transform.scale(pygame.image.load(fruit[2]),(fruitWidth,fruitLenght))
+for i in range(3, 9):
+    filename = f"img/image{i}.png"
+    fruit.append(filename)
+
+winImg = "img/win.png"
+fruitWidth = 100
+fruitLenght = 100
+posx=100
+
+item1 = pygame.transform.scale(pygame.image.load(fruit[0]),(fruitWidth,fruitLenght))
+item2 = pygame.transform.scale(pygame.image.load(fruit[1]),(fruitWidth,fruitLenght))
+item3 = pygame.transform.scale(pygame.image.load(fruit[2]),(fruitWidth,fruitLenght))
+item4 = pygame.transform.scale(pygame.image.load(fruit[3]),(fruitWidth,fruitLenght))
+item5 = pygame.transform.scale(pygame.image.load(fruit[4]),(fruitWidth,fruitLenght))
+item6 = pygame.transform.scale(pygame.image.load(fruit[5]),(fruitWidth,fruitLenght))
+# item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLenght))
+
 win = pygame.transform.scale(pygame.image.load(winImg),(800,800))
+overlay = pygame.transform.scale(pygame.image.load("img/untitled-1.png"),(800,480))
+stone = pygame.transform.scale(pygame.image.load("img/Group2.png"),(813,400))
+
+
 
 class Button:
     def __init__(self, text, x, y, width, height, color, hover_color, action):
@@ -80,42 +94,43 @@ def spin():
     speed5 = 400
     speeds = [speed1,speed2,speed3,speed4]
 
-    res1 = random.randint(0,2)
-    res2 = random.randint(0,2)
-    res3 = random.randint(0,2)
-    res4 = random.randint(0,2)
-    res5 = random.randint(0,2)
+    res1 = random.randint(0,6)
+    res2 = random.randint(0,6)
+    res3 = random.randint(0,6)
+    res4 = random.randint(0,6)
+    res5 = random.randint(0,6)
     res = [res1,res2,res3,res4,res5]
 
     while (True):
 
-        if event.type == pygame.KEYDOWN:
-            pass
+    
         if(speeds[3]>0):
-            screen.fill("red")
+            screen.blit(stone, (-7,47))
             for x in range(0,4):
                 if(speeds[x]>0):
-                    posy[x] = posy[x]+160
+                    posy[x] = posy[x]+100
                     if(posy[x] >180):
                         posy[x]=posy[x]-1600
                     speeds[x]= speeds[x]-5
-                        
 
                 
                 for i in range(-5,7):    # RENDER YOUR GAME HERE
                     if (i%3 == 0):
-                        img = lemon
+                        img = item1
                     
                     elif(i%3 == 1):
-                        img = melon    
+                        img = item2    
                     else:
-                        img = seven
-                    screen.blit(img, (posx+400*x,posy[x]+i*400+400*res[x]))
+                        img = item3
+                    screen.blit(img, (posx+100*x,posy[x]+i*100+100*res[x]))
+
             
         if (speeds[3] < 1):
+            screen.blit(overlay, (0,0))
             print(f"{res1}, {res2}, {res3}, {res4}")        
             if (res1 == res2 == res3 == res4):
                 print("You win")
+
                 screen.blit(win, (800,500))
                 pygame.display.flip()
                 point = point+1000
@@ -132,13 +147,13 @@ def spin():
         # RENDER YOUR GAME HERE
 
         # flip() the display to put your work on screen
+        screen.blit(overlay, (0,0))
         pygame.display.flip()
         
 
     clock.tick(60)  # limits FPS to 60
 
 while running:
-    print(point)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
