@@ -25,11 +25,11 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 GREEN_HOVER = (0, 200, 0)
 
-fruit = []
+fruit = ["img/image3.png","img/image4.png","img/image5.png","img/image6.png","img/image7.png","img/image8.png","img/image9.png",]
 
-for i in range(3, 9):
-    filename = f"img/image{i}.png"
-    fruit.append(filename)
+# for i in range(3, 9):
+#     filename = f"img/image{i}.png"
+#     fruit.append(filename)
 
 winImg = "img/win.png"
 fruitWidth = 100
@@ -42,7 +42,9 @@ item3 = pygame.transform.scale(pygame.image.load(fruit[2]),(fruitWidth,fruitLeng
 item4 = pygame.transform.scale(pygame.image.load(fruit[3]),(fruitWidth,fruitLenght))
 item5 = pygame.transform.scale(pygame.image.load(fruit[4]),(fruitWidth,fruitLenght))
 item6 = pygame.transform.scale(pygame.image.load(fruit[5]),(fruitWidth,fruitLenght))
-# item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLenght))
+item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLenght))
+
+items = [item1,item2,item3,item4,item5,item6,item7]
 
 win = pygame.transform.scale(pygame.image.load(winImg),(800,800))
 overlay = pygame.transform.scale(pygame.image.load("img/untitled-1.png"),(800,480))
@@ -91,7 +93,7 @@ def spin():
     speed2 = 250
     speed3 = 300
     speed4 = 350
-    speed5 = 450
+    speed5 = 400
     speeds = [speed1,speed2,speed3,speed4,speed5]
 
     res1 = random.randint(0,6)
@@ -101,44 +103,45 @@ def spin():
     res5 = random.randint(0,6)
     res = [res1,res2,res3,res4,res5]
 
+    row1 = random.sample(items, len(items))
+    row2 = random.sample(items, len(items))
+    row3 = random.sample(items, len(items))
+    row4 = random.sample(items, len(items))
+    row5 = random.sample(items, len(items))
+    rows = [row1,row2,row3,row4,row5]
+
+
     while (True):
-
     
-        if(speeds[3]>0):
-            screen.blit(stone, (-7,47))
+        if(speeds[4]>0):
+            screen.blit(stone, (-7,47)) 
             for x in range(0,5):
+                print(x)
                 if(speeds[x]>0):
-                    posy[x] = posy[x]+20
-                    if(posy[x] > 400):
-                        posy[x]=posy[x]-300
-                    speeds[x]= speeds[x]-5
+                    posy[x] = posy[x]+20  
+                    if(posy[x] > 800):
+                        posy[x]=posy[x]-700
 
-                
-                for i in range(-3,9):    # RENDER YOUR GAME HERE
-                    if (i%3 == 0):
-                        img = item1
-                    
-                    elif(i%3 == 1):
-                        img = item2    
-                    else:
-                        img = item3
-                    screen.blit(img, (posx+130*x,posy[x]+i*100-100*res[x]))
-                    font = pygame.font.Font(None, 36)
-                    text = font.render(f"bet:{bet}", True, (255, 255, 255))
-                    text_rect = text.get_rect(center=(400 + 50 / 2, 400 + 50 / 2))
-        
-                    screen.blit(text,text_rect)
+                    speeds[x]= speeds[x]-5
+                    print (speeds[4])
+
+
+                for i in range(0,14):    # RENDER YOUR GAME HERE
+                    img = rows[x][i%7] 
+                    screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+
 
             
-        if (speeds[3] < 1):
+        if (speeds[4] < 1):
             screen.blit(overlay, (0,0))
             print(f"{res1}, {res2}, {res3}, {res4}")        
-            if (res1 == res2 == res3 == res4):
+            # if (res1 == res2 == res3 == res4 == res5):
+            if (1):
                 print("You win")
 
-                screen.blit(win, (800,500))
+                screen.blit(rows[0][0], (800,500))
                 pygame.display.flip()
-                point = point+1000
+                point = point+100*bet
 
                 pygame.time.wait(200)
                 
