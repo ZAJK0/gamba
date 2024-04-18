@@ -14,7 +14,7 @@ for i in result:
 
 
 point = result[3]
-
+bet = 50
 
 pygame.init()
 screen = pygame.display.set_mode((800, 480))
@@ -34,7 +34,7 @@ for i in range(3, 9):
 winImg = "img/win.png"
 fruitWidth = 100
 fruitLenght = 100
-posx=100
+posx=90
 
 item1 = pygame.transform.scale(pygame.image.load(fruit[0]),(fruitWidth,fruitLenght))
 item2 = pygame.transform.scale(pygame.image.load(fruit[1]),(fruitWidth,fruitLenght))
@@ -80,19 +80,19 @@ def spin():
     # pygame.QUIT event means the user clicked X to close your window
     # fill the screen with a color to wipe away anything from last frame
     global point
-    point = point-50
+    point = point-bet
     posy1 = 0
     posy2 = 0 
     posy3 = 0
     posy4 = 0
     posy5 = 0
-    posy = [posy1,posy2,posy3,posy4]
+    posy = [posy1,posy2,posy3,posy4,posy5]
     speed1 = 200
     speed2 = 250
     speed3 = 300
     speed4 = 350
-    speed5 = 400
-    speeds = [speed1,speed2,speed3,speed4]
+    speed5 = 450
+    speeds = [speed1,speed2,speed3,speed4,speed5]
 
     res1 = random.randint(0,6)
     res2 = random.randint(0,6)
@@ -106,15 +106,15 @@ def spin():
     
         if(speeds[3]>0):
             screen.blit(stone, (-7,47))
-            for x in range(0,4):
+            for x in range(0,5):
                 if(speeds[x]>0):
-                    posy[x] = posy[x]+100
-                    if(posy[x] >180):
-                        posy[x]=posy[x]-1600
+                    posy[x] = posy[x]+20
+                    if(posy[x] > 400):
+                        posy[x]=posy[x]-300
                     speeds[x]= speeds[x]-5
 
                 
-                for i in range(-5,7):    # RENDER YOUR GAME HERE
+                for i in range(-3,9):    # RENDER YOUR GAME HERE
                     if (i%3 == 0):
                         img = item1
                     
@@ -122,7 +122,12 @@ def spin():
                         img = item2    
                     else:
                         img = item3
-                    screen.blit(img, (posx+100*x,posy[x]+i*100+100*res[x]))
+                    screen.blit(img, (posx+130*x,posy[x]+i*100-100*res[x]))
+                    font = pygame.font.Font(None, 36)
+                    text = font.render(f"bet:{bet}", True, (255, 255, 255))
+                    text_rect = text.get_rect(center=(400 + 50 / 2, 400 + 50 / 2))
+        
+                    screen.blit(text,text_rect)
 
             
         if (speeds[3] < 1):
@@ -162,6 +167,13 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE: 
                 spin()
+            if event.key ==pygame.K_LEFT:
+                if (bet > 50):
+                    bet = bet - 50
+                    print(bet)
+            if event.key == pygame.K_RIGHT:
+                bet = bet + 50
+                print(bet)
 
         if  event.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
