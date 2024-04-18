@@ -17,7 +17,7 @@ point = result[3]
 bet = 50
 
 pygame.init()
-screen = pygame.display.set_mode((800, 480))
+screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 
@@ -46,7 +46,7 @@ item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLeng
 
 items = [item1,item2,item3,item4,item5,item6,item7]
 
-win = pygame.transform.scale(pygame.image.load(winImg),(800,800))
+win = pygame.transform.scale(pygame.image.load(winImg),(200,200))
 overlay = pygame.transform.scale(pygame.image.load("img/untitled-1.png"),(800,480))
 stone = pygame.transform.scale(pygame.image.load("img/Group2.png"),(813,400))
 
@@ -135,11 +135,20 @@ def spin():
         if (speeds[4] < 1):
             screen.blit(overlay, (0,0))
             print(f"{res1}, {res2}, {res3}, {res4}")        
-            # if (res1 == res2 == res3 == res4 == res5):
+            # if (rows[0][4] == rows[1][4] == rows[2][4]):
             if (1):
+                if (rows[2][4]==rows[3][4]):
+
+                    if(rows[3][4]==rows[4][4]):
+                        point = point+100*bet
+                    else:
+                        point = point+50*bet
+                else:
+                    point = point+10*bet
+
                 print("You win")
 
-                screen.blit(rows[0][0], (800,500))
+                screen.blit(win, (300,140))
                 pygame.display.flip()
                 point = point+100*bet
 
