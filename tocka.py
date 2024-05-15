@@ -47,6 +47,9 @@ item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLeng
 
 items = [item1,item2,item3,item4,item5,item6,item7]
 
+
+# test
+print("rtest")
 win = pygame.transform.scale(pygame.image.load(winImg),(200,200))
 overlay = pygame.transform.scale(pygame.image.load("img/untitled-1.png"),(800,480))
 stone = pygame.transform.scale(pygame.image.load("img/Group2.png"),(813,400))
