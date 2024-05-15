@@ -15,9 +15,10 @@ for i in result:
 
 point = result[3]
 bet = 50
+spinned = False
 
 pygame.init()
-screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((800, 480))
 clock = pygame.time.Clock()
 running = True
 
@@ -116,14 +117,12 @@ def spin():
         if(speeds[4]>0):
             screen.blit(stone, (-7,47)) 
             for x in range(0,5):
-                print(x)
                 if(speeds[x]>0):
                     posy[x] = posy[x]+20  
                     if(posy[x] > 800):
                         posy[x]=posy[x]-700
 
                     speeds[x]= speeds[x]-5
-                    print (speeds[4])
 
 
                 for i in range(0,14):    # RENDER YOUR GAME HERE
@@ -133,13 +132,16 @@ def spin():
 
             
         if (speeds[4] < 1):
+            global spinned
+            spinned = False
             screen.blit(overlay, (0,0))
             print(f"{res1}, {res2}, {res3}, {res4}")        
-            # if (rows[0][4] == rows[1][4] == rows[2][4]):
-            if (1):
-                if (rows[2][4]==rows[3][4]):
+            if (rows[0][4] == rows[1][2] == rows[2][0]):
+            # if (1):
+                pygame.draw.rect(screen, GREEN, pygame.Rect(100, 230, 600, 20))
+                if (rows[2][0]==rows[3][5]):
 
-                    if(rows[3][4]==rows[4][4]):
+                    if(rows[3][5]==rows[4][3]):
                         point = point+100*bet
                     else:
                         point = point+50*bet
@@ -147,8 +149,10 @@ def spin():
                     point = point+10*bet
 
                 print("You win")
+                
 
-                screen.blit(win, (300,140))
+
+                screen.blit(rows[4][3], (300,140))
                 pygame.display.flip()
                 point = point+100*bet
 
@@ -157,7 +161,6 @@ def spin():
                 
             print(point)
             pygame.display.flip()
-
             pygame.time.wait(1000)
 
             break
@@ -168,29 +171,32 @@ def spin():
         pygame.display.flip()
         
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(60)   # limits FPS to 60
 
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
-            mydb.commit()
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE: 
-                spin()
-            if event.key ==pygame.K_LEFT:
-                if (bet > 50):
-                    bet = bet - 50
+    if (spinned == False):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+                mydb.commit()
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if (event.key == pygame.K_SPACE) : 
+                    print (spinned)
+                    spinned = True
+                    spin()
+                if event.key ==pygame.K_LEFT:
+                    if (bet > 50):
+                        bet = bet - 50
                     print(bet)
-            if event.key == pygame.K_RIGHT:
-                bet = bet + 50
-                print(bet)
+                if event.key == pygame.K_RIGHT:
+                    bet = bet + 50
+                    print(bet)
 
-        if  event.type == pygame.MOUSEBUTTONDOWN:
-            pos = pygame.mouse.get_pos()
-            if button.is_hover(pos):
-                spin()
+            if  event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                if button.is_hover(pos):
+                    spin()
     button.draw(screen)
     pygame.display.flip()
  
