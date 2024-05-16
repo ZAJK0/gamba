@@ -4,17 +4,8 @@ import random
 import mysql.connector
 # pygame setup
 
-user = "zajo"
-mydb = mysql.connector.connect(host="localhost", user="root", password="",database="gamba")
-mycursor = mydb.cursor()
-mycursor.execute(f"select *from body where user = '{user}'")
-result = mycursor.fetchone()
-for i in result:
-    print(i)
-
-
-point = result[3]
 bet = 50
+lines = 1
 spinned = False
 
 pygame.init()
@@ -48,8 +39,6 @@ item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLeng
 items = [item1,item2,item3,item4,item5,item6,item7]
 
 
-# test
-print("rtest")
 win = pygame.transform.scale(pygame.image.load(winImg),(200,200))
 overlay = pygame.transform.scale(pygame.image.load("img/untitled-1.png"),(800,480))
 stone = pygame.transform.scale(pygame.image.load("img/Group2.png"),(813,400))
@@ -79,14 +68,64 @@ class Button:
             return True
         return False
     
-button = Button("Click Me", 300, 200, 200, 100, GREEN, GREEN_HOVER, lambda: print("Button Clicked"))
+button = Button("", 300, 200, 200, 100, GREEN, GREEN_HOVER, lambda: print("Button Clicked"))
+
+
+def checkLines(rows,surx2,sury2,surc2,surv2,surb2):
+    global point
+    if (rows[0][surx2] == rows[1][sury2] == rows[2][surc2]):
+    # if (1):
+        if (rows[0][surx2] == item1):
+            multiply = 20
+        elif (rows[0][surx2] == item2):
+            multiply = 16
+        elif (rows[0][surx2] == item3):
+            multiply = 8
+        elif (rows[0][surx2] == item4):
+            multiply = 12
+        elif (rows[0][surx2] == item5):
+            multiply = 6
+        elif (rows[0][surx2] == item6):
+            multiply = 4
+        elif (rows[0][surx2] == item7):
+            multiply = 2                                                       
+        pygame.draw.rect(screen, (255,255,255), pygame.Rect(100, 230, 600, 20))
+        if (rows[2][surc2]==rows[3][4]):
+
+            if(rows[3][surv2]==rows[4][surb2]):
+                point = point+50*bet*multiply
+            else:
+                point = point+25*bet*multiply
+        else: 
+            point = point+5*bet*multiply
+
+        print("You win")
+        
+        screen.blit(rows[0][surx2], (300,140))
+        pygame.display.flip()
+        pygame.time.wait(500)
+        screen.blit(rows[1][sury2], (300,140))
+        pygame.display.flip()
+        pygame.time.wait(500)
+        screen.blit(rows[2][surc2], (300,140))
+        pygame.display.flip()
+        pygame.time.wait(500)
+        screen.blit(rows[3][surv2], (300,140))
+        pygame.display.flip()
+        pygame.time.wait(500)
+        screen.blit(rows[4][surb2], (300,140))
+        pygame.display.flip()
+        pygame.time.wait(500)
+
+
+
 
 def spin():
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
     # fill the screen with a color to wipe away anything from last frame
     global point
-    point = point-bet
+    point = point-bet*lines
     posy1 = 0
     posy2 = 0 
     posy3 = 0
@@ -100,6 +139,7 @@ def spin():
     speed5 = 400
     speeds = [speed1,speed2,speed3,speed4,speed5]
 
+# toto potom vymazat
     res1 = random.randint(0,6)
     res2 = random.randint(0,6)
     res3 = random.randint(0,6)
@@ -116,7 +156,7 @@ def spin():
 
 
     while (True):
-    
+
         if(speeds[4]>0):
             screen.blit(stone, (-7,47)) 
             for x in range(0,5):
@@ -137,72 +177,114 @@ def spin():
         if (speeds[4] < 1):
             global spinned
             spinned = False
+            print(rows[0][0])
+
+            print(items[0])
             screen.blit(overlay, (0,0))
-            print(f"{res1}, {res2}, {res3}, {res4}")        
-            if (rows[0][4] == rows[1][2] == rows[2][0]):
-            # if (1):
-                pygame.draw.rect(screen, GREEN, pygame.Rect(100, 230, 600, 20))
-                if (rows[2][0]==rows[3][5]):
+            print(f"{res1}, {res2}, {res3}, {res4}")      
+            if (lines >= 1):  
+                checkLines(rows,4,2,0,5,3)
+            if (lines >= 3):  
+                checkLines(rows,3,1,6,4,2)
+                checkLines(rows,5,3,1,6,4)
 
-                    if(rows[3][5]==rows[4][3]):
-                        point = point+100*bet
-                    else:
-                        point = point+50*bet
-                else:
-                    point = point+10*bet
+            if (lines >= 5):  
+                checkLines(rows,3,2,1,5,2)
+                checkLines(rows,5,2,6,5,4)
 
-                print("You win")
+            if (lines >= 7):  
+                checkLines(rows,3,1,0,6,4)
+                checkLines(rows,5,3,0,4,2)
+
+            if (lines >= 9):  
+                checkLines(rows,4,1,0,6,3)
+                checkLines(rows,4,3,0,4,3)
+
+
                 
-
-
-                screen.blit(rows[4][3], (300,140))
-                pygame.display.flip()
-                point = point+100*bet
-
-                pygame.time.wait(200)
-                
-                
-            print(point)
-            pygame.display.flip()
-            pygame.time.wait(1000)
-
+            
+            print("test")
             break
         # RENDER YOUR GAME HERE
 
         # flip() the display to put your work on screen
         screen.blit(overlay, (0,0))
+        font2 = pygame.font.Font(None, 50)  
+        betText = font2.render(f"bet: {bet}            lines: {lines}", True, (255, 255, 255))  
+        screen.blit(betText, (50 ,440 ))
+        print(point)
         pygame.display.flip()
-        
+        pygame.display.flip()
+    
 
     clock.tick(60)   # limits FPS to 60
-
 while running:
-    if (spinned == False):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
-                mydb.commit()
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if (event.key == pygame.K_SPACE) : 
-                    print (spinned)
-                    spinned = True
-                    spin()
-                if event.key ==pygame.K_LEFT:
-                    if (bet > 50):
-                        bet = bet - 50
-                    print(bet)
-                if event.key == pygame.K_RIGHT:
-                    bet = bet + 50
-                    print(bet)
+    user = ""
+    while(user == ""):
+        screen.fill("red")
+        font = pygame.font.Font(None, 36)  
+        uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
+        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+        pygame.display.flip()
+        user = input()
 
-            if  event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                if button.is_hover(pos):
-                    spin()
-    button.draw(screen)
-    pygame.display.flip()
- 
+    
+
+    mydb = mysql.connector.connect(host="localhost", user="root", password="",database="gamba")
+    mycursor = mydb.cursor()
+    mycursor.execute(f"select *from body where user = '{user}'")
+    result = mycursor.fetchone()
+    for i in result:
+        print(i)
+    point = result[3]   
+
+    while running and (user != "") and (point > 0):
+        if (spinned == False):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+                    mydb.commit()
+                    running = False
+
+                elif event.type == pygame.KEYDOWN:
+                    if (event.key == pygame.K_SPACE) : 
+                        print (spinned)
+                        spinned = True
+                        spin()
+                        # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
+                        pygame.display.flip()
+                    if event.key ==pygame.K_LEFT:
+                        if (bet > 50):
+                             bet = bet - 50
+                        print(bet)
+                    if event.key == pygame.K_RIGHT:
+                        bet = bet + 50
+                        print(bet)
+                    
+                    if event.key ==pygame.K_a:
+                        if (lines > 1):
+                            lines = lines-2
+                        print(lines)
+                    if event.key == pygame.K_d:
+                        if (lines < 9):
+                            lines = lines+2
+                        print(lines)
+
+                if  event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    if button.is_hover(pos):
+                        spin()
+        button.draw(screen)
+        pygame.display.flip()
+    if (point <= 0):
+        screen.fill("red")
+        font = pygame.font.Font(None, 36)  
+        uvodText = font.render("Nemate ziadne body", True, (255, 255, 255))  
+        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+        pygame.display.flip()
+        pygame.time.wait(5000)
+
+        
 
 
 
