@@ -99,7 +99,6 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2):
         else: 
             point = point+5*bet*multiply
 
-        print("You win")
         
         screen.blit(rows[0][surx2], (300,140))
         pygame.display.flip()
