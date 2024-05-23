@@ -6,6 +6,7 @@ import mysql.connector
 
 bet = 50
 lines = 1
+point = 0
 spinned = False
 
 pygame.init()
@@ -16,6 +17,9 @@ running = True
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 GREEN_HOVER = (0, 200, 0)
+
+font2 = pygame.font.Font(None, 50)  
+
 
 fruit = ["img/image3.png","img/image4.png","img/image5.png","img/image6.png","img/image7.png","img/image8.png","img/image9.png",]
 
@@ -70,6 +74,11 @@ class Button:
     
 button = Button("", 300, 200, 200, 100, GREEN, GREEN_HOVER, lambda: print("Button Clicked"))
 
+def showStats():
+    screen.blit(overlay, (0,0))
+    betText = font2.render(f"bet: {bet}            lines: {lines}        points:{point}", True, (255, 255, 255))  
+    screen.blit(betText, (50 ,440 ))
+
 
 def checkLines(rows,surx2,sury2,surc2,surv2,surb2):
     global point
@@ -98,7 +107,7 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2):
                 point = point+25*bet*multiply
         else: 
             point = point+5*bet*multiply
-
+        showStats()
         
         screen.blit(rows[0][surx2], (300,140))
         pygame.display.flip()
@@ -170,6 +179,7 @@ def spin():
                 for i in range(0,14):    # RENDER YOUR GAME HERE
                     img = rows[x][i%7] 
                     screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+            showStats()
 
 
             
@@ -179,7 +189,6 @@ def spin():
             print(rows[0][0])
 
             print(items[0])
-            screen.blit(overlay, (0,0))
             print(f"{res1}, {res2}, {res3}, {res4}")      
             if (lines >= 1):  
                 checkLines(rows,4,2,0,5,3)
@@ -207,10 +216,7 @@ def spin():
         # RENDER YOUR GAME HERE
 
         # flip() the display to put your work on screen
-        screen.blit(overlay, (0,0))
-        font2 = pygame.font.Font(None, 50)  
-        betText = font2.render(f"bet: {bet}            lines: {lines}", True, (255, 255, 255))  
-        screen.blit(betText, (50 ,440 ))
+
         print(point)
         pygame.display.flip()
         pygame.display.flip()
@@ -220,6 +226,7 @@ def spin():
 while running:
     user = ""
     while(user == ""):
+        # user = "fabo"
         screen.fill("red")
         font = pygame.font.Font(None, 36)  
         uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
@@ -237,38 +244,46 @@ while running:
         print(i)
     point = result[3]   
 
-    while running and (user != "") and (point > 0):
+    while running and (user != ""):
         if (spinned == False):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
                     mydb.commit()
                     running = False
+                    # user = ""
 
                 elif event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_SPACE) : 
-                        print (spinned)
-                        spinned = True
-                        spin()
-                        # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
-                        pygame.display.flip()
+                        if(point >= bet*lines):
+                            print (spinned)
+                            spinned = True
+                            spin()
+                            # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
+                            pygame.display.flip()
+                        else:
+                            mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+                            mydb.commit()
+                            user = ""
                     if event.key ==pygame.K_LEFT:
                         if (bet > 50):
                              bet = bet - 50
                         print(bet)
+                        showStats()
                     if event.key == pygame.K_RIGHT:
                         bet = bet + 50
                         print(bet)
-                    
+                        showStats()
                     if event.key ==pygame.K_a:
                         if (lines > 1):
                             lines = lines-2
                         print(lines)
+                        showStats()
                     if event.key == pygame.K_d:
                         if (lines < 9):
                             lines = lines+2
                         print(lines)
-
+                        showStats()
                 if  event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     if button.is_hover(pos):
