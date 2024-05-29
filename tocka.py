@@ -128,34 +128,26 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
         # pygame.draw.rect(screen, (255,255,255), pygame.Rect(100, 230, 600, 20))
         screen.blit(line.image, (line.position_x,line.position_y))
 
+
+        showStats()
+        font = pygame.font.Font(None, 80)  
+        uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
         
         if (rows[2][surc2]==rows[3][4]):
 
             if(rows[3][surv2]==rows[4][surb2]):
                 point = point+50*bet*multiply
+                uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
+
             else:
                 point = point+25*bet*multiply
+                uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
+
         else: 
             point = point+5*bet*multiply
-        showStats()
-        
-        screen.blit(rows[0][surx2], (300,140))
-        pygame.display.flip()
-        pygame.time.wait(500)
-        screen.blit(rows[1][sury2], (300,140))
-        pygame.display.flip()
-        pygame.time.wait(500)
-        screen.blit(rows[2][surc2], (300,140))
-        pygame.display.flip()
-        pygame.time.wait(500)
-        screen.blit(rows[3][surv2], (300,140))
-        pygame.display.flip()
-        pygame.time.wait(500)
-        screen.blit(rows[4][surb2], (300,140))
-        pygame.display.flip()
-        pygame.time.wait(500)
+            uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
 
-
+        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2)) 
 
 
 def spin():
@@ -274,7 +266,7 @@ while running:
 
     screen.blit(stone, (-7,47)) 
     showStats()
-    
+
     while running and (user != ""):
         if (spinned == False):
             for event in pygame.event.get():
