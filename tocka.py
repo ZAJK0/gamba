@@ -7,6 +7,7 @@ import mysql.connector
 bet = 50
 lines = 1
 point = 0
+winSum = 0
 spinned = False
 
 pygame.init()
@@ -16,16 +17,11 @@ running = True
 
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
+BLACK = (0,0,0)
 GREEN_HOVER = (0, 200, 0)
 
 font2 = pygame.font.Font(None, 50)  
-
-
 fruit = ["img/image3.png","img/image4.png","img/image5.png","img/image6.png","img/image7.png","img/image8.png","img/image9.png",]
-
-# for i in range(3, 9):
-#     filename = f"img/image{i}.png"
-#     fruit.append(filename)
 
 winImg = "img/win.png"
 fruitWidth = 100
@@ -49,6 +45,54 @@ item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLeng
 
 items = [item1,item2,item3,item4,item5,item6,item7]
 
+
+
+
+_circle_cache = {}
+def _circlepoints(r):
+    r = int(round(r))
+    if r in _circle_cache:
+        return _circle_cache[r]
+    x, y, e = r, 0, 1 - r
+    _circle_cache[r] = points = []
+    while x >= y:
+        points.append((x, y))
+        y += 1
+        if e < 0:
+            e += 2 * y - 1
+        else:
+            x -= 1
+            e += 2 * (y - x) - 1
+    points += [(y, x) for x, y in points if x > y]
+    points += [(-x, y) for x, y in points if x]
+    points += [(x, -y) for x, y in points if y]
+    points.sort()
+    return points
+
+def render(text, font, color1, color2,surface, opx=2):
+    textsurface = font.render(text, True, color1).convert_alpha()
+    w = textsurface.get_width() + 2 * opx
+    h = font.get_height()
+
+    osurf = pygame.Surface((w, h + 2 * opx)).convert_alpha()
+    osurf.fill((0, 0, 0, 0))
+
+    surf = osurf.copy()
+
+    osurf.blit(font.render(text, True, color2).convert_alpha(), (0, 0))
+
+    for dx, dy in _circlepoints(opx):
+        surf.blit(osurf, (dx + opx, dy + opx))
+
+    surf.blit(textsurface, (opx, opx))
+    if (surface):
+        return surf
+    else:
+        return textsurface
+
+
+
+
 linesUrl = ["img/cara_1.png","img/cara_2.png","img/cara_3.png","img/cara_4.png","img/cara_5.png","img/cara_6.png","img/cara_7.png","img/cara_8.png","img/cara_9.png"]
 
 class LinesClass:
@@ -62,7 +106,6 @@ class LinesClass:
         # Draw the image on the given surface at the specified position
         surface.blit(self.image, (self.position_x, self.position_y))
 
-
 line1 = LinesClass(linesUrl[8],72,236)
 line2 = LinesClass(linesUrl[7],72,136)
 line3 = LinesClass(linesUrl[1],72,336)
@@ -75,30 +118,8 @@ line9 = LinesClass(linesUrl[3],72,122)
 
 linesComp = [line1,line2,line3,line4,line5,line6,line7,line8,line9]
 
-class Button:
-    def __init__(self, text, x, y, width, height, color, hover_color, action):
-        self.text = text
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.color = color
-        self.hover_color = hover_color
-        self.action = action
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
-        font = pygame.font.Font(None, 36)
-        text = font.render(self.text, True, (255, 255, 255))
-        text_rect = text.get_rect(center=(self.x + self.width / 2, self.y + self.height / 2))
-        screen.blit(text, text_rect)
 
-    def is_hover(self, pos):
-        if self.x < pos[0] < self.x + self.width and self.y < pos[1] < self.y + self.height:
-            return True
-        return False
-    
-button = Button("", 300, 200, 200, 100, GREEN, GREEN_HOVER, lambda: print("Button Clicked"))
 
 def showStats():
     screen.blit(overlay, (0,0))
@@ -106,8 +127,10 @@ def showStats():
     screen.blit(betText, (50 ,430 ))
 
 
+
+
 def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
-    global point
+    global winSum
     if (rows[0][surx2] == rows[1][sury2] == rows[2][surc2]):
     # if (1):
         if (rows[0][surx2] == item1):
@@ -130,24 +153,17 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
 
 
         showStats()
-        font = pygame.font.Font(None, 80)  
-        uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
         
         if (rows[2][surc2]==rows[3][4]):
 
             if(rows[3][surv2]==rows[4][surb2]):
-                point = point+50*bet*multiply
-                uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
-
+                winSum = winSum+50*bet*multiply
             else:
-                point = point+25*bet*multiply
-                uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
-
+                winSum = winSum+25*bet*multiply
         else: 
-            point = point+5*bet*multiply
-            uvodText = font.render(f"VYHRA: {5*bet*multiply}", True, (255, 255, 255))  
+            winSum = winSum+5*bet*multiply
 
-        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2)) 
+
 
 
 def spin():
@@ -157,6 +173,7 @@ def spin():
     global point
     global rows
     global posy
+    global winSum
     point = point-bet*lines
     posy1 = 0
     posy2 = 0 
@@ -229,6 +246,14 @@ def spin():
             if (lines >= 9):  
                 checkLines(rows,4,1,0,6,3,line8)
                 checkLines(rows,4,3,0,4,3,line9)
+            if(winSum > 0):
+                point = point + winSum
+                font = pygame.font.Font(None, 80)  
+                fontRend = render(f"VYHRA: {winSum}", font,WHITE,BLACK,0)
+                fontText = render(f"VYHRA: {winSum}", font,WHITE,BLACK,1) 
+                screen.blit(fontText, (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+                winSum = 0
+
 
 
             
@@ -249,9 +274,12 @@ while running:
         # user = "fabo"
         screen.blit(pozadie, (0,0))
 
-        font = pygame.font.Font(None, 36)  
-        uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
-        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+        font = pygame.font.Font(None, 72)  
+        fontRend = render('Prilozte svoje kartu', font,WHITE,BLACK,0)
+        screen.blit(render('Prilozte svoje kartu', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+        # uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
+        
+        # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
         pygame.display.flip()
         user = input()
     
@@ -266,6 +294,10 @@ while running:
 
     screen.blit(stone, (-7,47)) 
     showStats()
+    font = pygame.font.Font(None, 36)  
+
+    # text_with_border("VYHRA:dssdassadas", font, WHITE, GREEN, 10)
+
 
     while running and (user != ""):
         if (spinned == False):
@@ -306,29 +338,29 @@ while running:
                     if event.key ==pygame.K_a:
                         if (lines > 1):
                             lines = lines-2
-                            screen.blit(stone, (-7,47)) 
-                            if (posy != []):
-                                for x in range(0,5):
-                                    for i in range(0,14):    # RENDER YOUR GAME HERE
-                                        img = rows[x][i%7] 
-                                        screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
-                            showStats()
-                            for i in range(lines):
-                                print (i)
-                                screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
+                        screen.blit(stone, (-7,47)) 
+                        if (posy != []):
+                            for x in range(0,5):
+                                for i in range(0,14):    # RENDER YOUR GAME HERE
+                                    img = rows[x][i%7] 
+                                    screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+                        showStats()
+                        for i in range(lines):
+                            print (i)
+                            screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
 
                     if event.key == pygame.K_d:
                         if (lines < 9):
                             lines = lines+2
-                            showStats()
+                        showStats()
 
-                            for i in range(lines):
-                                screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
-                                
-                if  event.type == pygame.MOUSEBUTTONDOWN:
-                    pos = pygame.mouse.get_pos()
-                    if button.is_hover(pos):
-                        spin()
+                        for i in range(lines):
+                            screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
+                            
+                # if  event.type == pygame.MOUSEBUTTONDOWN:
+                #     pos = pygame.mouse.get_pos()
+                    # if button.is_hover(pos):
+                    #     spin()
         # button.draw(screen)
         pygame.display.flip()
     if (point <= 0):
