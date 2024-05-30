@@ -159,7 +159,7 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
             if(rows[3][surv2]==rows[4][surb2]):
                 winSum = winSum+50*bet*multiply
             else:
-                winSum = winSum+25*bet*multiply
+                winSum = winSum+10*bet*multiply
         else: 
             winSum = winSum+5*bet*multiply
 
@@ -187,14 +187,6 @@ def spin():
     speed4 = 350
     speed5 = 400
     speeds = [speed1,speed2,speed3,speed4,speed5]
-
-# toto potom vymazat
-    res1 = random.randint(0,6)
-    res2 = random.randint(0,6)
-    res3 = random.randint(0,6)
-    res4 = random.randint(0,6)
-    res5 = random.randint(0,6)
-    res = [res1,res2,res3,res4,res5]
 
     row1 = random.sample(items, len(items))
     row2 = random.sample(items, len(items))
@@ -228,7 +220,6 @@ def spin():
             print(rows[0][0])
 
             print(items[0])
-            print(f"{res1}, {res2}, {res3}, {res4}")      
             if (lines >= 1):  
                 checkLines(rows,4,2,0,5,3,line1)
             if (lines >= 3):  
@@ -253,9 +244,12 @@ def spin():
                 fontText = render(f"VYHRA: {winSum}", font,WHITE,BLACK,1) 
                 screen.blit(fontText, (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
                 winSum = 0
+                showStats()
+                pygame.display.flip()
+                pygame.time.wait(500)
 
-
-
+            mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+            mydb.commit()
             
             print("test")
             break
@@ -293,13 +287,25 @@ while running:
     point = result[3]   
 
     screen.blit(stone, (-7,47)) 
-    showStats()
     font = pygame.font.Font(None, 36)  
+    screen.blit(stone, (-7,47)) 
+    row1 = random.sample(items, len(items))
+    row2 = random.sample(items, len(items))
+    row3 = random.sample(items, len(items))
+    row4 = random.sample(items, len(items))
+    row5 = random.sample(items, len(items))
+    rows = [row1,row2,row3,row4,row5]
+    posy = [800,300,800,300,800]
+    for x in range(0,5):
+        for i in range(0,14):    # RENDER YOUR GAME HERE
+            img = rows[x][i%7] 
+            screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
 
+    showStats()
     # text_with_border("VYHRA:dssdassadas", font, WHITE, GREEN, 10)
 
 
-    while running and (user != ""):
+    while running and (user != "") and (point >= 50):
         if (spinned == False):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -317,10 +323,17 @@ while running:
                             # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
                             pygame.display.flip()
                         else:
-                            font = pygame.font.Font(None, 36)
-                            uvodText = font.render("Nemate dost bodov na spin", True, (255, 255, 255))
-                            screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+                            if (point < 50):
+                                user = ""
+                            # font = pygame.font.Font(None, 36)
+                            font = pygame.font.Font(None, 72)  
+                            fontRend = render('Nemate dost bodov na spin', font,WHITE,BLACK,0)
+                            screen.blit(render('Nemate dost bodov na spin', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+        
+                            # uvodText = font.render("Nemate dost bodov na spin", True, (255, 255, 255))
+                            # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
                             pygame.display.flip()
+
         
                             # mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
                             # mydb.commit()
@@ -339,11 +352,12 @@ while running:
                         if (lines > 1):
                             lines = lines-2
                         screen.blit(stone, (-7,47)) 
-                        if (posy != []):
-                            for x in range(0,5):
-                                for i in range(0,14):    # RENDER YOUR GAME HERE
-                                    img = rows[x][i%7] 
-                                    screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+                        for x in range(0,5):
+                            for i in range(0,14):    # RENDER YOUR GAME HERE
+                                img = rows[x][i%7] 
+                                screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+                            print(posy)
+
                         showStats()
                         for i in range(lines):
                             print (i)
@@ -352,8 +366,12 @@ while running:
                     if event.key == pygame.K_d:
                         if (lines < 9):
                             lines = lines+2
+                        screen.blit(stone, (-7,47)) 
+                        for x in range(0,5):
+                            for i in range(0,14):    # RENDER YOUR GAME HERE
+                                img = rows[x][i%7] 
+                                screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
                         showStats()
-
                         for i in range(lines):
                             screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
                             
@@ -363,11 +381,12 @@ while running:
                     #     spin()
         # button.draw(screen)
         pygame.display.flip()
-    if (point <= 0):
-        screen.fill("red")
-        font = pygame.font.Font(None, 36)  
-        uvodText = font.render("Nemate ziadne body", True, (255, 255, 255))  
-        screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+    if (point <= 49):
+        screen.blit(pozadie, (0,0))
+        font = pygame.font.Font(None, 72)  
+        fontRend = render('Nemate ziadne body', font,WHITE,BLACK,0)
+        screen.blit(render('Nemate ziadne body', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+        
         pygame.display.flip()
         pygame.time.wait(5000)
 
