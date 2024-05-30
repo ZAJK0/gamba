@@ -93,7 +93,6 @@ def render(text, font, color1, color2,surface, opx=2):
 
 
 
-linesUrl = ["img/cara_1.png","img/cara_2.png","img/cara_3.png","img/cara_4.png","img/cara_5.png","img/cara_6.png","img/cara_7.png","img/cara_8.png","img/cara_9.png"]
 
 class LinesClass:
     def __init__(self, img, position_x, position_y):
@@ -106,6 +105,7 @@ class LinesClass:
         # Draw the image on the given surface at the specified position
         surface.blit(self.image, (self.position_x, self.position_y))
 
+linesUrl = ["img/cara_1.png","img/cara_2.png","img/cara_3.png","img/cara_4.png","img/cara_5.png","img/cara_6.png","img/cara_7.png","img/cara_8.png","img/cara_9.png","img/cara_10.png","img/cara_11.png"]
 line1 = LinesClass(linesUrl[8],72,236)
 line2 = LinesClass(linesUrl[7],72,136)
 line3 = LinesClass(linesUrl[1],72,336)
@@ -115,6 +115,8 @@ line6 = LinesClass(linesUrl[0],72,103)
 line7 = LinesClass(linesUrl[4],72,103)
 line8 = LinesClass(linesUrl[2],72,122)
 line9 = LinesClass(linesUrl[3],72,122)
+line10 = LinesClass(linesUrl[9],72,134)
+line11 = LinesClass(linesUrl[10],72,134)
 
 linesComp = [line1,line2,line3,line4,line5,line6,line7,line8,line9]
 
@@ -231,8 +233,8 @@ def spin():
                 checkLines(rows,5,2,6,5,4,line5)
 
             if (lines >= 7):  
-                checkLines(rows,3,1,0,6,4,line6)
-                checkLines(rows,5,3,0,4,2,line7)
+                checkLines(rows,3,1,0,6,4,line10)
+                checkLines(rows,5,3,0,4,2,line11)
 
             if (lines >= 9):  
                 checkLines(rows,4,1,0,6,3,line8)
