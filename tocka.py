@@ -2,7 +2,11 @@
 import pygame
 import random
 import mysql.connector
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
 # pygame setup
+
+reader = SimpleMFRC522()
 
 bet = 50
 lines = 1
@@ -11,7 +15,7 @@ winSum = 0
 spinned = False
 
 pygame.init()
-screen = pygame.display.set_mode((800, 480))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 clock = pygame.time.Clock()
 running = True
 
@@ -277,10 +281,26 @@ while running:
         
         # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
         pygame.display.flip()
-        user = input()
-    
+        id, text = reader.read()
+        print(id)
+        print(text)
+        mydb = mysql.connector.connect(host="localhost", user="admin", password="heslo",database="gamba")
+        mycursor = mydb.cursor()
+        mycursor.execute(f"SELECT COUNT(*) FROM `body` WHERE user = '{text}'")
+        result = mycursor.fetchone()
+        print(result[0])
+        if result[0] == 1:
+            user = text
+        else:
+            screen.blit(pozadie, (0,0))
+            fontRend = render('Nespravna karta', font,WHITE,BLACK,0)
+            screen.blit(render('Nespravna karta', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+            pygame.display.flip()
+            pygame.time.delay(3000)
+        # uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))    
 
-    mydb = mysql.connector.connect(host="localhost", user="root", password="",database="gamba")
+
+    GPIO.cleanup() 
     mycursor = mydb.cursor()
     mycursor.execute(f"select *from body where user = '{user}'")
     result = mycursor.fetchone()
