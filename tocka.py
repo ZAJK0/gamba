@@ -124,15 +124,15 @@ line11 = LinesClass(linesUrl[10],72,134)
 
 linesComp = [line1,line2,line3,line4,line5,line6,line7,line8,line9]
 
-
-
-
 def showStats():
     screen.blit(overlay, (0,0))
-    betText = font2.render(f"BET: {bet}         LINES: {lines}         POINTS:{point}", True, (255, 255, 255))  
-    screen.blit(betText, (50 ,430 ))
+    betText1 = font2.render(f"BET: {bet}", True, (255, 255, 255))  
+    betText2 = font2.render(f"LINES: {lines}", True, (255, 255, 255))  
+    betText3 = font2.render(f"POINTS: {point}", True, (255, 255, 255))  
 
-
+    screen.blit(betText3, (40 ,430 ))
+    screen.blit(betText1, (380 ,430 ))
+    screen.blit(betText2, (620 ,430 ))
 
 
 def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
@@ -329,13 +329,77 @@ while running:
 
     while running and (user != "") and (point >= 50):
         if (spinned == False):
+            GPIO.setmode(GPIO.BOARD) # 7 11 12 13
+            GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            GPIO.setup(11, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+            if GPIO.input(7) == GPIO.HIGH:
+                if bet > 50:
+                    bet -= 50
+                    print(bet)
+                    showStats()
+                    pygame.time.delay(200)
+
+            if GPIO.input(11) == GPIO.HIGH:
+                if bet < 1000:
+                    bet += 50
+                    print(bet)
+                    showStats()
+                    pygame.time.delay(200)
+            if GPIO.input(12) == GPIO.HIGH:
+                if(point >= bet*lines):
+                    print (spinned)
+                    spinned = True
+                    spin()
+                    # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
+                    pygame.display.flip()
+                else:
+                    if (point < 50):
+                        user = ""
+                        # font = pygame.font.Font(None, 36)
+                        font = pygame.font.Font(None, 72)  
+                        fontRend = render('Nemate dost bodov na spin', font,WHITE,BLACK,0)
+                        screen.blit(render('Nemate dost bodov na spin', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
+        
+                        # uvodText = font.render("Nemate dost bodov na spin", True, (255, 255, 255))
+                        # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+                        pygame.display.flip()
+            if GPIO.input(40) == GPIO.HIGH: 
+                if (lines > 1):
+                    lines = lines-2
+                screen.blit(stone, (-7,47)) 
+                for x in range(0,5):
+                    for i in range(0,14):    # RENDER YOUR GAME HERE
+                        img = rows[x][i%7] 
+                        screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+                    print(posy)
+
+                showStats()
+                for i in range(lines):
+                    print (i)
+                    screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
+                pygame.time.delay(200)                
+            if GPIO.input(38) == GPIO.HIGH: 
+                if (lines < 9):
+                    lines = lines+2
+                screen.blit(stone, (-7,47)) 
+                for x in range(0,5):
+                    for i in range(0,14):    # RENDER YOUR GAME HERE
+                        img = rows[x][i%7] 
+                        screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
+                showStats()
+                for i in range(lines):
+                    screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
+                pygame.time.delay(200)                
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
                     mydb.commit()
                     # running = False
                     user = ""
-
                 elif event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_SPACE) : 
                         if(point >= bet*lines):
