@@ -1,10 +1,8 @@
-# Example file showing a basic pygame "game loop"
 import pygame
 import random
 import mysql.connector
 import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
-# pygame setup
 
 reader = SimpleMFRC522()
 
@@ -49,9 +47,6 @@ item7 = pygame.transform.scale(pygame.image.load(fruit[6]),(fruitWidth,fruitLeng
 
 items = [item1,item2,item3,item4,item5,item6,item7]
 
-
-
-
 _circle_cache = {}
 def _circlepoints(r):
     r = int(round(r))
@@ -94,19 +89,13 @@ def render(text, font, color1, color2,surface, opx=2):
     else:
         return textsurface
 
-
-
-
-
 class LinesClass:
     def __init__(self, img, position_x, position_y):
-        # Initialize the class with image, and x, y positions
         self.image = pygame.image.load(img)
         self.position_x = position_x
         self.position_y = position_y
 
     def draw(self, surface):
-        # Draw the image on the given surface at the specified position
         surface.blit(self.image, (self.position_x, self.position_y))
 
 linesUrl = ["img/cara_1.png","img/cara_2.png","img/cara_3.png","img/cara_4.png","img/cara_5.png","img/cara_6.png","img/cara_7.png","img/cara_8.png","img/cara_9.png","img/cara_10.png","img/cara_11.png"]
@@ -154,14 +143,10 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
         elif (rows[0][surx2] == item7):
             multiply = 2          
                                         
-        # pygame.draw.rect(screen, (255,255,255), pygame.Rect(100, 230, 600, 20))
         screen.blit(line.image, (line.position_x,line.position_y))
-
-
         showStats()
         
         if (rows[2][surc2]==rows[3][4]):
-
             if(rows[3][surv2]==rows[4][surb2]):
                 winSum = winSum+50*bet*multiply
             else:
@@ -169,13 +154,7 @@ def checkLines(rows,surx2,sury2,surc2,surv2,surb2,line):
         else: 
             winSum = winSum+5*bet*multiply
 
-
-
-
 def spin():
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    # fill the screen with a color to wipe away anything from last frame
     global point
     global rows
     global posy
@@ -187,11 +166,11 @@ def spin():
     posy4 = 0
     posy5 = 0
     posy = [posy1,posy2,posy3,posy4,posy5]
-    speed1 = 200
-    speed2 = 250
-    speed3 = 300
-    speed4 = 350
-    speed5 = 400
+    speed1 = 100
+    speed2 = 125
+    speed3 = 150
+    speed4 = 200
+    speed5 = 225
     speeds = [speed1,speed2,speed3,speed4,speed5]
 
     row1 = random.sample(items, len(items))
@@ -207,25 +186,22 @@ def spin():
             screen.blit(stone, (-7,47)) 
             for x in range(0,5):
                 if(speeds[x]>0):
-                    posy[x] = posy[x]+20  
+                    posy[x] = posy[x]+40  
                     if(posy[x] > 800):
                         posy[x]=posy[x]-700
                     speeds[x]= speeds[x]-5
 
 
-                for i in range(0,14):    # RENDER YOUR GAME HERE
+                for i in range(0,14):    
                     img = rows[x][i%7] 
                     screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
             showStats()
-
-
             
         if (speeds[4] < 1):
+
             global spinned
             spinned = False
-            print(rows[0][0])
 
-            print(items[0])
             if (lines >= 1):  
                 checkLines(rows,4,2,0,5,3,line1)
             if (lines >= 3):  
@@ -252,42 +228,30 @@ def spin():
                 winSum = 0
                 showStats()
                 pygame.display.flip()
-                pygame.time.wait(500)
-
-            mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
-            mydb.commit()
-            
-            print("test")
+                pygame.time.wait(500)            
             break
-        # RENDER YOUR GAME HERE
-
-        # flip() the display to put your work on screen
-
-        print(point)
         pygame.display.flip()
     
 
-    clock.tick(60)   # limits FPS to 60
+    clock.tick(60) 
 while running:
     user = ""
     while(user == ""):
-        # user = "fabo"
         screen.blit(pozadie, (0,0))
 
         font = pygame.font.Font(None, 72)  
         fontRend = render('Prilozte svoje kartu', font,WHITE,BLACK,0)
         screen.blit(render('Prilozte svoje kartu', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
-        # uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))  
-        
-        # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
+       
         pygame.display.flip()
         id, text = reader.read()
         print(id)
         print(text)
-        mydb = mysql.connector.connect(host="localhost", user="admin", password="heslo",database="gamba")
+        mydb = mysql.connector.connect(host="us.vybrat.eu", user="3ATVojar_pavian", password="Jcauq55Ua0",database="3ATVojar_pavian")
         mycursor = mydb.cursor()
         mycursor.execute(f"SELECT COUNT(*) FROM `body` WHERE user = '{text}'")
         result = mycursor.fetchone()
+        mycursor.close()
         print(result[0])
         if result[0] == 1:
             user = text
@@ -297,17 +261,16 @@ while running:
             screen.blit(render('Nespravna karta', font,WHITE,BLACK,1), (800 // 2 - fontRend.get_width() // 2,480 // 2 - fontRend.get_height() // 2))
             pygame.display.flip()
             pygame.time.delay(3000)
-        # uvodText = font.render("Prilozte svoje kartu", True, (255, 255, 255))    
-
 
     GPIO.cleanup() 
+    mydb = mysql.connector.connect(host="us.vybrat.eu", user="3ATVojar_pavian", password="Jcauq55Ua0",database="3ATVojar_pavian")
     mycursor = mydb.cursor()
     mycursor.execute(f"select *from body where user = '{user}'")
     result = mycursor.fetchone()
     for i in result:
         print(i)
     point = result[3]   
-
+    mycursor.close()
     screen.blit(stone, (-7,47)) 
     font = pygame.font.Font(None, 36)  
     screen.blit(stone, (-7,47)) 
@@ -319,14 +282,11 @@ while running:
     rows = [row1,row2,row3,row4,row5]
     posy = [800,300,800,300,800]
     for x in range(0,5):
-        for i in range(0,14):    # RENDER YOUR GAME HERE
+        for i in range(0,14):    
             img = rows[x][i%7] 
             screen.blit(img, (posx+130*x,posy[x]+i*100-1010))
 
     showStats()
-    # text_with_border("VYHRA:dssdassadas", font, WHITE, GREEN, 10)
-
-
     while running and (user != "") and (point >= 50):
         if (spinned == False):
             GPIO.setmode(GPIO.BOARD) # 7 11 12 13
@@ -335,14 +295,14 @@ while running:
             GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
             GPIO.setup(38, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
             GPIO.setup(40, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-            if GPIO.input(7) == GPIO.HIGH:
+            if GPIO.input(40) == GPIO.HIGH:
                 if bet > 50:
                     bet -= 50
                     print(bet)
                     showStats()
                     pygame.time.delay(200)
 
-            if GPIO.input(11) == GPIO.HIGH:
+            if GPIO.input(38) == GPIO.HIGH:
                 if bet < 1000:
                     bet += 50
                     print(bet)
@@ -355,6 +315,11 @@ while running:
                     spin()
                     # screen.blit(betText, (800 // 2 - betText.get_width() // 2,440  - betText.get_height() // 2))
                     pygame.display.flip()
+                    mydb = mysql.connector.connect(host="us.vybrat.eu", user="3ATVojar_pavian", password="Jcauq55Ua0",database="3ATVojar_pavian")
+                    mycursor = mydb.cursor()     
+                    mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+                    mydb.commit()
+                    mycursor.close()
                 else:
                     if (point < 50):
                         user = ""
@@ -366,7 +331,12 @@ while running:
                         # uvodText = font.render("Nemate dost bodov na spin", True, (255, 255, 255))
                         # screen.blit(uvodText, (800 // 2 - uvodText.get_width() // 2,480 // 2 - uvodText.get_height() // 2))
                         pygame.display.flip()
-            if GPIO.input(40) == GPIO.HIGH: 
+                        mydb = mysql.connector.connect(host="us.vybrat.eu", user="3ATVojar_pavian", password="Jcauq55Ua0",database="3ATVojar_pavian")
+                        mycursor = mydb.cursor()     
+                        mycursor.execute(f"UPDATE body SET point = {point} WHERE user = '{user}'")
+                        mydb.commit()
+                        mycursor.close()
+            if GPIO.input(7) == GPIO.HIGH: 
                 if (lines > 1):
                     lines = lines-2
                 screen.blit(stone, (-7,47)) 
@@ -381,7 +351,7 @@ while running:
                     print (i)
                     screen.blit(linesComp[i].image, (linesComp[i].position_x,linesComp[i].position_y))
                 pygame.time.delay(200)                
-            if GPIO.input(38) == GPIO.HIGH: 
+            if GPIO.input(11) == GPIO.HIGH: 
                 if (lines < 9):
                     lines = lines+2
                 screen.blit(stone, (-7,47)) 
